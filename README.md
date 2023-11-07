@@ -41,7 +41,7 @@ print(answer)
 ## Future Steps
 
 - [ ] Add simple conversation memory using external Document DB (MongoDB) for multi-turn conversations.
-- [ ] Add more accurately curated source documents to the ChatBot knowledge base. Then updating the VectorDB.
+- [ ] Add more accurately curated source documents to the ChatBot knowledge base. Then updating the VectorDB. Checkpoint at "Alarmas.md" from the Simetrik Knowledge Bot.
 - [x] Provide python notebook with LangServe python SDK usage example to interact with the API as if it were a regular Runnable.
 - [ ] Update Readme with more detailed instructions on how to use the API
 - [ ] UPdate installation instructions and repo description
