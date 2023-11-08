@@ -29,8 +29,12 @@ if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
 
 PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX", "langchain-test")
 
+# Define the vectorstore and retriever
 vectorstore = Pinecone.from_existing_index(PINECONE_INDEX_NAME, OpenAIEmbeddings())
 retriever = vectorstore.as_retriever()
+
+#Define OpenAI model
+llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.0)
 
 # Condense a chat history and follow-up question into a standalone question
 _template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language.
@@ -82,25 +86,25 @@ _search_query = RunnableBranch(
     # If input includes chat_history, we condense it with the follow-up question
     (
         RunnableLambda(lambda x: bool(x.get("chat_history"))).with_config(
-            run_name="HasChatHistoryCheck"
+            run_name="HasChatHistory"
         ),  # Condense follow-up question and chat into a standalone_question
         RunnablePassthrough.assign(
             chat_history=lambda x: _format_chat_history(x["chat_history"])
-        )
+        ).with_config(run_name="Format Chat History")
         | CONDENSE_QUESTION_PROMPT
-        | ChatOpenAI(model="gpt-3.5-turbo", temperature=0.0)
+        | llm
         | StrOutputParser(),
     ),
     # Else, we have no chat history, so just pass through the question
-    RunnableLambda(itemgetter("question")),
-)
+    RunnableLambda(itemgetter("question")).with_config(run_name="NoChatHistory"),
+).with_config(run_name="ChatHistoryBranch")
 
 _inputs = RunnableMap(
     {
         "question": lambda x: x["question"],
         "chat_history": lambda x: _format_chat_history(x["chat_history"]),
-        "context": _search_query | retriever | _combine_documents,
+        "context": (_search_query | retriever | _combine_documents).with_config(run_name="Context Retrieval & Combination"),
     }
-).with_types(input_type=ChatHistory)
+).with_types(input_type=ChatHistory).with_config({"run_name": "Contextualized Input"})
 
-chain = _inputs | ANSWER_PROMPT | ChatOpenAI() | StrOutputParser()
+chain = (_inputs | ANSWER_PROMPT | llm | StrOutputParser()).with_config({"run_name": "Chatbot Interaction"})

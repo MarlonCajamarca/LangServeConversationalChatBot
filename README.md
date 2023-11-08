@@ -40,21 +40,39 @@ LANGCHAIN_PROJECT=YOUR_PROJECT
 LANGCHAIN_ENDPOINT=YOUR_ENDPOINT
 ```
 
-## Usage
-
-To use this package, you should first have the LangChain CLI installed:
+## Project SetUp and Dependencies Installation
+It is highly reccomended to use a virtual environment for this project. If you don't have one, you can create one by:
 
 ```shell
-pip install -U langchain-cli
+python -m venv venv
 ```
 
-If you are inside the app directory (`cd simetrik-knowledge-bot`), then you can spin up a LangServe instance directly by:
+Then activate the virtual environment by:
+
+```shell
+source venv/bin/activate
+```
+
+To run this project, you should first install the required dependencies by:
+
+```shell
+pip install -r requirements.txt
+```
+## Usage
+
+Go to the project folder containing the app to be deployed:
+
+```shell
+cd simetrik-knowledge-bot
+```
+
+then you can spin up a LangServe instance directly by:
 
 ```shell
 langchain serve
 ```
 
-This will start the FastAPI app with a server is running locally at 
+This will start the FastAPI app with a server running locally at 
 [http://localhost:8000](http://localhost:8000)
 
 
@@ -97,6 +115,7 @@ print(answer)
 ## Future Steps
 
 - [ ] Add simple conversation memory using external Document DB (MongoDB) for multi-turn conversations.
+- [ ] Upgrade OpenAI LLM to latest gpt3.5-turbo-0611 model
 - [ ] Add Documentation on how to store and populate the VectorDB with the knowledge base documents. 
 - [ ] Add more accurately curated source documents to the ChatBot knowledge base. Then updating the VectorDB. Checkpoint at "Alarmas.md" from the Simetrik Knowledge Bot.
 - [x] Provide python notebook with LangServe python SDK usage example to interact with the API as if it were a regular Runnable.
